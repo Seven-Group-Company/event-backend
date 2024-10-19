@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as speakeasy from 'speakeasy';
-import { generateQR } from 'src/helpers/qr-codeGenerator';
 import { UtilsService } from 'src/utils/utils.service';
 import { userTemplate } from 'src/helpers/emailTemplates/createUserTemplate';
 import { otpTemplate } from 'src/helpers/emailTemplates/OTPTemplate';
@@ -20,7 +19,7 @@ export class AuthService {
 
   async createUser(dto: AuthDto) {
     try {
-      const { name, email, photo } = dto;
+      const { email } = dto;
       const checkExistance = await this.prisma.users.findUnique({
         where: {
           email,
@@ -35,30 +34,14 @@ export class AuthService {
           data: null,
         };
       }
-
-      const secret = speakeasy.generateSecret({
-        length: 20,
-        name: `SGC-Event-Mgt (${email})`,
-        issuer: 'SGC-Insurance',
-      });
-
       const user = await this.prisma.users.create({
         data: {
           email: dto.email,
-          name: dto.name,
           createdBy: 1,
-          photo,
-          mfa: {
-            create: {
-              mfaSecret: secret.base32,
-              mfaQrCode: await generateQR(secret.otpauth_url),
-              mfaEnabled: false,
-            },
-          },
         },
       });
       const emailData = {
-        name,
+        name: user.email,
       };
 
       // Send OTP to user
@@ -83,24 +66,18 @@ export class AuthService {
   loginUser = async (dto: AuthDto) => {
     const { email } = dto;
     try {
-      const existance: { id: number; name: string; email: string } =
-        await this.prisma.users.findUnique({
-          where: {
-            email,
-          },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        });
+      const existance = await this.prisma.users.findUnique({
+        where: {
+          email,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      });
       if (!existance) {
-        return {
-          success: false,
-          statusCode: 404,
-          message: 'Invalid Email',
-          data: null,
-        };
+        await this.createUser(dto);
       }
       const otpExistance = await this.prisma.otp.findUnique({
         where: {
@@ -115,7 +92,7 @@ export class AuthService {
         });
 
         const emailData = {
-          name: existance.name,
+          name: email,
           otp,
         };
 
@@ -147,7 +124,7 @@ export class AuthService {
         encoding: 'base32',
       });
       const emailData = {
-        name: existance.name,
+        name: email,
         otp,
       };
       console.log(otp);
@@ -187,12 +164,7 @@ export class AuthService {
               email: true,
               name: true,
               photo: true,
-              mfa: {
-                select: {
-                  mfaQrCode: true,
-                  mfaEnabled: true,
-                },
-              },
+              role: true,
             },
           },
         },
@@ -224,6 +196,8 @@ export class AuthService {
       });
 
       if (verified) {
+        const token = await this.jwtService.signAsync(existance.user);
+
         await this.prisma.otp.delete({
           where: {
             email,
@@ -234,10 +208,7 @@ export class AuthService {
           success: true,
           statusCode: 200,
           message: 'Login Successfull',
-          data: {
-            mfaQrCode: existance.user?.mfa?.mfaQrCode,
-            mfaEnabled: existance.user?.mfa?.mfaEnabled,
-          },
+          data: { token },
         };
       } else {
         return {
@@ -254,63 +225,6 @@ export class AuthService {
         message: 'Internal Server Error',
         data: null,
         error: error.message,
-      };
-    }
-  };
-
-  verifyMFA = async (dto: AuthDto) => {
-    const { email, token } = dto;
-
-    const existance: any = await this.prisma.users.findUnique({
-      where: {
-        email,
-      },
-      select: {
-        name: true,
-        email: true,
-        mfa: true,
-      },
-    });
-
-    if (email === existance.email) {
-      const verified = speakeasy.totp.verify({
-        secret: existance.mfa?.mfaSecret,
-        encoding: 'base32',
-        token: token,
-        window: 1, // Accepts OTPs generated up to one time step before or after the current time
-      });
-
-      if (verified) {
-        const token = await this.jwtService.signAsync(existance);
-
-        await this.prisma.mfa.update({
-          where: {
-            email,
-          },
-          data: {
-            mfaEnabled: true,
-          },
-        });
-        return {
-          success: true,
-          statusCode: 200,
-          message: 'MFA verified successfully',
-          data: { token: token },
-        };
-      } else {
-        return {
-          success: false,
-          statusCode: 404,
-          message: 'Invalid Verification Code',
-          data: null,
-        };
-      }
-    } else {
-      return {
-        success: false,
-        statusCode: 404,
-        message: 'Invalid Email',
-        data: null,
       };
     }
   };

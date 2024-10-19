@@ -13,18 +13,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  active    Boolean   @default(true)
-  photo     String?
+model Users {
+  id          Int      @id @default(autoincrement())
+  name        String?
+  email       String   @unique
+  createdAt   DateTime @default(now())
+  active      Boolean  @default(true)
+  photo       String?
+  role        Role     @default(Client)
+  phoneNumber String?
+
   createdBy Int
   updatedAt DateTime?
   updatedBy Int?
   otp       otp?
-  mfa       mfa?
+
+  // relationships
+  organizedEvents Event[] @relation("OrganizerEvents")
+
+  @@map("users")
+}
+
+// Enum for roles
+enum Role {
+  Admin
+  Client
 }
 
 model otp {
@@ -32,14 +45,27 @@ model otp {
   email     String   @unique
   otp       String
   createdAt DateTime @default(now())
-  user      users    @relation(fields: [email], references: [email])
+  user      Users    @relation(fields: [email], references: [email])
 }
 
-model mfa {
-  id         Int     @id @default(autoincrement())
-  email      String  @unique
-  mfaSecret  String
-  mfaQrCode  String
-  mfaEnabled Boolean @default(false)
-  user       users   @relation(fields: [email], references: [email])
+// Event model
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  category    String?
+  location    String?
+  startDate   DateTime
+  endDate     DateTime
+  isRecurring Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign key for the organizer
+  organizer   Users @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  organizerId Int
+
+  // Relationships
+
+  @@map("events")
 }

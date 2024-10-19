@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: event_backend
+    env_file: .env
+    restart: on-failure
+    ports:
+      - 7777:7777
