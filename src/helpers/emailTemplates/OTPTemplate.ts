@@ -1,4 +1,4 @@
-export const otpTemplate = (emailData: { name: string; otp: number }) => {
+export const otpTemplate = (emailData: { otp: number }) => {
   return `
     <!DOCTYPE html>
 <html lang="en">
@@ -53,7 +53,6 @@ export const otpTemplate = (emailData: { name: string; otp: number }) => {
       <h1>OTP Verification</h1>
     </div>
     <div class="content">
-      <p>Dear ${emailData.name},</p>
       <p>Your One-Time Password (OTP) for verification is:</p>
       <p class="otp">${emailData.otp}</p>
       <p>Please use this OTP to complete your verification. Do not share this code with anyone.</p>

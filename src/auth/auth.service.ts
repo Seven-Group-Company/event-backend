@@ -92,7 +92,6 @@ export class AuthService {
         });
 
         const emailData = {
-          name: email,
           otp,
         };
 
@@ -124,7 +123,6 @@ export class AuthService {
         encoding: 'base32',
       });
       const emailData = {
-        name: email,
         otp,
       };
       console.log(otp);

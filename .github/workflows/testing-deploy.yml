@@ -1,8 +1,8 @@
-name: Production CI/CD
+name: Testing CI/CD
 
 on:
   push:
-    branches: ["production"]
+    branches: ['develop']
 
 jobs:
   deploy:
@@ -16,4 +16,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/scripts && \
-            sudo bash deploy-backend.sh
+            sudo bash deploy-event-backend.sh
