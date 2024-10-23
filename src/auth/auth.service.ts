@@ -40,12 +40,9 @@ export class AuthService {
           createdBy: 1,
         },
       });
-      const emailData = {
-        name: user.email,
-      };
 
       // Send OTP to user
-      await this.utils.sendEmail(userTemplate(emailData), email, 'OTP');
+      await this.utils.sendEmail(userTemplate(), email, 'OTP');
       return {
         success: true,
         statusCode: 200,

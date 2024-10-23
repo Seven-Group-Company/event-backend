@@ -1,70 +1,83 @@
-export const userTemplate = (emailData: { name: string }) => {
+export const userTemplate = () => {
   return `
     <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to SGC-Insurance</title>
+    <title>Welcome Email</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
-        .container {
-            width: 80%;
+        .email-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
+            border: 1px solid #dddddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: #f8f9fa;
-            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
         }
         .content {
             padding: 20px;
+            text-align: center;
+        }
+        .content h2 {
+            color: #333333;
+        }
+        .content p {
+            color: #666666;
+            line-height: 1.6;
         }
         .footer {
-            background-color: #f8f9fa;
-            padding: 10px 20px;
+            background-color: #f4f4f4;
+            padding: 10px;
             text-align: center;
-            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #999999;
         }
         .button {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 10px 0;
-            color: #fff;
             background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="email-container">
         <div class="header">
-            <h1>Welcome to SGC-Insurance!</h1>
+            <h1>Welcome to Event Management System</h1>
         </div>
         <div class="content">
-            <p>Dear ${emailData.name},</p>
-            <p>Welcome to SGC-Insurance! We are delighted to have you as a part of our community. At SGC-Insurance, we strive to provide you with the best services and support to meet your insurance needs.</p>
-            <p>Here are a few things you can do to get started:</p>
-            <ul>
-                <li><strong>Log in to Your Account:</strong> Visit our website and log in with your email. , <a href="https://insurance-frontend-fork.vercel.app/auth/login" class="button">click here</a>, An OTP will be sent to your email to confirm.</li>
-                <li><strong>Explore Our Services:</strong> Once logged in, you can explore the various insurance products and services we offer. Whether you're looking for health, life, auto, or home insurance, we have a range of options tailored to your needs.</li>
-            </ul>
-            <p>If you have any questions or need assistance, feel free to contact our support team at support@sgc-insurance.com.</p>
-            <p>Thank you for choosing SGC-Insurance. We look forward to serving you!</p>
-            <p>Best regards,<br>The SGC-Insurance Team</p>
+            <h2>Hello there!🎉</h2>
+            <p>We are excited to have you on board with us! Your journey to create and manage amazing events starts here. Our system offers you an easy and efficient way to manage event registrations, ticketing, guest lists, and much more.</p>
+            <p>If you have any questions or need assistance, feel free to reach out. We are here to help you every step of the way.</p>
+            <a href="[your-link]" class="button">Get Started</a>
         </div>
         <div class="footer">
-            <p>&copy; 2024 SGC-Insurance. All rights reserved.</p>
+            <p>&copy; 2024 Event Management System. All rights reserved.</p>
         </div>
     </div>
 </body>
 </html>
+
     `;
 };
