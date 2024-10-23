@@ -42,7 +42,7 @@ export class AuthService {
       });
 
       // Send OTP to user
-      await this.utils.sendEmail(userTemplate(), email, 'OTP');
+      await this.utils.sendEmail(userTemplate(), email, 'Welcome');
       return {
         success: true,
         statusCode: 200,
